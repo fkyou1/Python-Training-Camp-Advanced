@@ -9,6 +9,8 @@ IoU 是目标检测任务中常用的评估指标。
 请补全下面的函数 `calculate_iou`。
 """
 import numpy as np
+from pandas.core.computation.expr import intersection
+
 
 def calculate_iou(box1, box2):
     """
@@ -38,4 +40,19 @@ def calculate_iou(box1, box2):
     # 6. 计算并集面积 union_area = box1_area + box2_area - intersection_area。
     # 7. 计算 IoU = intersection_area / union_area。
     #    注意处理 union_area 为 0 的情况 (除零错误)。
-    pass 
+    x_left = max(box1[0], box2[0])
+    y_bottom = max(box1[1], box2[1])
+    x_right = min(box1[2], box2[2])
+    y_top = min(box1[3], box2[3])
+    if x_right < x_left or y_bottom > y_top:
+        intersection_area = 0
+    else:
+        intersection_area = (x_right-x_left)*(y_top-y_bottom)
+    box1_area = (box1[2]-box1[0])*(box1[3]-box1[1])
+    box2_area = (box2[2]-box2[0])*(box2[3]-box2[1])
+    union_area = box1_area + box2_area - intersection_area
+    if union_area == 0:
+        IoU = 1
+    else:
+        IoU = intersection_area / union_area
+    return IoU
